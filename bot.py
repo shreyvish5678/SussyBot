@@ -14,7 +14,7 @@ async def send_message(message, user_message, is_private):
         if user_id in response_times:
             elapsed_time = time.time() - response_times[user_id]
             if elapsed_time < 5:
-                await message.author.send("Please wait", message.author + "!") if is_private else await message.channel.send("Please wait", message.author + "!")
+                await message.author.send(f"Please wait {message.author}!") if is_private else await message.channel.send(f"Please wait {message.author}!")
                 return
         response_times[user_id] = time.time()
         response = responses.handle_response(user_message)
