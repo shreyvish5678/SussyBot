@@ -2,7 +2,7 @@ import tensorflow as tf
 interpreter = tf.lite.Interpreter(model_path='human_face_generator.tflite')
 def handle_response(message) -> str:
     message = message.lower()
-    if message == "test":
+    if message == "how":
         return "working"
     elif message == "generate":
         interpreter.allocate_tensors()
