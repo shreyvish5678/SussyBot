@@ -5,9 +5,18 @@ from dotenv import load_dotenv
 from PIL import Image
 import numpy as np
 import io
+import time
 load_dotenv()
+response_times = {}
 async def send_message(message, user_message, is_private):
     try:
+        user_id = str(message.author.id)
+        if user_id in response_times:
+            elapsed_time = time.time() - response_times[user_id]
+            if elapsed_time < 5:
+                await message.author.send("Please wait", message.author + "!") if is_private else await message.channel.send("Please wait", message.author + "!")
+                return
+        response_times[user_id] = time.time()
         response = responses.handle_response(user_message)
         if isinstance(response, str):
             await message.author.send(response) if is_private else await message.channel.send(response)
