@@ -5,4 +5,4 @@ with sqlite3.connect("user_db.db") as connection:
     cursor.execute("SELECT * FROM user_usage")
     rows = cursor.fetchall()
     for row in rows:
-        print(row)
+        print(row)     
