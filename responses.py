@@ -10,7 +10,7 @@ def handle_response(message) -> str:
         interpreter.invoke()
         generated_output = interpreter.tensor(interpreter.get_output_details()[0]['index'])()[0]
         returned_tensor = tf.cast((generated_output + 1) * 127.5, tf.uint8)
-        return returned_tensor
+        return {"image": returned_tensor, "noise": random_noise}
         
         
     

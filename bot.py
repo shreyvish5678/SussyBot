@@ -5,8 +5,10 @@ from dotenv import load_dotenv
 from PIL import Image
 import numpy as np
 import io
-import sqlite3
+import numpy
 import time
+import tensorflow as tf
+import json
 load_dotenv()
 response_times = {}
 TOKEN = os.getenv("BOT_TOKEN")
@@ -24,29 +26,66 @@ async def send_message(message, user_message, is_private):
                 return
         response_times[user_id] = time.time()
         response = responses.handle_response(user_message)
-        image_data = np.array(response, dtype=np.uint8)
+        image_data = np.array(response["image"], dtype=np.uint8)
+        noise = tf.reshape(response["noise"], shape=(100,)).numpy().tolist()
+        rating = -1
         img_byte_array = io.BytesIO()
-        Image.fromarray(image_data, 'RGB').save(img_byte_array, format='PNG')
+        Image.fromarray(image_data, 'RGB').resize((400, 400)).save(img_byte_array, format='PNG')
         img_byte_array.seek(0)
-        await message.author.send(file=discord.File(img_byte_array, 'generated_image.png')) if is_private else await message.channel.send(file=discord.File(img_byte_array, 'generated_image.png'))
-        with sqlite3.connect("user_db.db") as connection:
-            cursor = connection.cursor()
-            cursor.execute('''CREATE TABLE IF NOT EXISTS user_usage (
-                                id INTEGER PRIMARY KEY,
-                                name TEXT,
-                                usage_count INTEGER
-                            )''')
-            connection.commit()
-        with sqlite3.connect("user_db.db") as connection:
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM user_usage WHERE name = ?", (user_name,))
-            existing_user = cursor.fetchone()
-            if existing_user:
-                usage_count = existing_user[2] + 1
-                cursor.execute("UPDATE user_usage SET usage_count = ? WHERE name = ?", (usage_count, user_name))
-            else:
-                cursor.execute("INSERT INTO user_usage (name, usage_count) VALUES (?, 1)", (user_name,))
-            connection.commit()
+        button1 = discord.ui.Button(label="1", style=discord.ButtonStyle.green)
+        button2 = discord.ui.Button(label="2", style=discord.ButtonStyle.green)
+        button3 = discord.ui.Button(label="3", style=discord.ButtonStyle.green)
+        button4 = discord.ui.Button(label="4", style=discord.ButtonStyle.green, row=0)
+        button5 = discord.ui.Button(label="5", style=discord.ButtonStyle.green, row=0)
+        view = discord.ui.View()
+        view.add_item(button1)
+        view.add_item(button2)
+        view.add_item(button3)
+        view.add_item(button4)
+        view.add_item(button5)
+        await message.author.send(file=discord.File(img_byte_array, 'generated_image.png'), view=view) if is_private else await message.channel.send(file=discord.File(img_byte_array, 'generated_image.png'), view=view)
+        async def button_1_callback(interaction: discord.Interaction):
+            if interaction.user.id == interaction.message.author.id:
+                rating = 1
+                await interaction.response.edit_message(content="You rated it 1/5", view=None)
+        async def button_2_callback(interaction: discord.Interaction):
+            if interaction.user.id == interaction.message.author.id:
+                rating = 2
+                await interaction.response.edit_message(content="You rated it 2/5", view=None)
+        async def button_3_callback(interaction: discord.Interaction):
+            rating = 3
+            await interaction.response.edit_message(content="You rated it 3/5", view=None)
+        async def button_4_callback(interaction: discord.Interaction):
+            rating = 4
+            await interaction.response.edit_message(content="You rated it 4/5", view=None)
+        async def button_5_callback(interaction: discord.Interaction):
+            rating = 5
+            await interaction.response.edit_message(content="You rated it 5/5", view=None)
+        button1.callback = button_1_callback
+        button2.callback = button_2_callback
+        button3.callback = button_3_callback
+        button4.callback = button_4_callback
+        button5.callback = button_5_callback
+        try:
+            with open('feedback.json', 'r') as file:
+                feedback_data = json.load(file)
+        except FileNotFoundError:
+            feedback_data = {}
+        key = max(feedback_data.keys(), default=-1) + 1 if feedback_data else 0
+        feedback_data[key] = {"noise": noise, "rating": rating}
+        with open('feedback.json', 'w') as file:
+            json.dump(feedback_data, file)
+        try:
+            with open('user.json', 'r') as file:
+                user_data = json.load(file)
+        except FileNotFoundError:
+            user_data = {}
+        if user_name not in user_data:
+            user_data[user_name] = 1
+        else:
+            user_data[user_name] += 1
+        with open('user.json', 'w') as file:
+            json.dump(user_data, file)
     except Exception as e:
         print(e)
 
