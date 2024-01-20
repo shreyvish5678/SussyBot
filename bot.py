@@ -28,7 +28,6 @@ async def send_message(message, user_message, is_private):
         response = responses.handle_response(user_message)
         image_data = np.array(response["image"], dtype=np.uint8)
         noise = tf.reshape(response["noise"], shape=(100,)).numpy().tolist()
-        rating = -1
         img_byte_array = io.BytesIO()
         Image.fromarray(image_data, 'RGB').resize((400, 400)).save(img_byte_array, format='PNG')
         img_byte_array.seek(0)
@@ -44,37 +43,42 @@ async def send_message(message, user_message, is_private):
         view.add_item(button4)
         view.add_item(button5)
         await message.author.send(file=discord.File(img_byte_array, 'generated_image.png'), view=view) if is_private else await message.channel.send(file=discord.File(img_byte_array, 'generated_image.png'), view=view)
-        async def button_1_callback(interaction: discord.Interaction):
-            if interaction.user.id == interaction.message.author.id:
-                rating = 1
-                await interaction.response.edit_message(content="You rated it 1/5", view=None)
-        async def button_2_callback(interaction: discord.Interaction):
-            if interaction.user.id == interaction.message.author.id:
-                rating = 2
-                await interaction.response.edit_message(content="You rated it 2/5", view=None)
-        async def button_3_callback(interaction: discord.Interaction):
-            rating = 3
-            await interaction.response.edit_message(content="You rated it 3/5", view=None)
-        async def button_4_callback(interaction: discord.Interaction):
-            rating = 4
-            await interaction.response.edit_message(content="You rated it 4/5", view=None)
-        async def button_5_callback(interaction: discord.Interaction):
-            rating = 5
-            await interaction.response.edit_message(content="You rated it 5/5", view=None)
-        button1.callback = button_1_callback
-        button2.callback = button_2_callback
-        button3.callback = button_3_callback
-        button4.callback = button_4_callback
-        button5.callback = button_5_callback
         try:
             with open('feedback.json', 'r') as file:
                 feedback_data = json.load(file)
         except FileNotFoundError:
             feedback_data = {}
-        key = max(feedback_data.keys(), default=-1) + 1 if feedback_data else 0
-        feedback_data[key] = {"noise": noise, "rating": rating}
-        with open('feedback.json', 'w') as file:
-            json.dump(feedback_data, file)
+        key = max([int(digit) for digit in list(feedback_data.keys())], default=-1) + 1 if feedback_data else 0
+        async def button_1_callback(interaction: discord.Interaction):
+            await interaction.response.edit_message(content="You rated it 1/5", view=None)
+            feedback_data[key] = {"noise": noise, "rating": 1}
+            with open('feedback.json', 'w') as file:
+                json.dump(feedback_data, file)
+        async def button_2_callback(interaction: discord.Interaction):
+            await interaction.response.edit_message(content="You rated it 2/5", view=None)
+            feedback_data[key] = {"noise": noise, "rating": 2}
+            with open('feedback.json', 'w') as file:
+                json.dump(feedback_data, file)
+        async def button_3_callback(interaction: discord.Interaction):
+            await interaction.response.edit_message(content="You rated it 3/5", view=None)
+            feedback_data[key] = {"noise": noise, "rating": 3}
+            with open('feedback.json', 'w') as file:
+                json.dump(feedback_data, file)
+        async def button_4_callback(interaction: discord.Interaction):
+            await interaction.response.edit_message(content="You rated it 4/5", view=None)
+            feedback_data[key] = {"noise": noise, "rating": 4}
+            with open('feedback.json', 'w') as file:
+                json.dump(feedback_data, file)
+        async def button_5_callback(interaction: discord.Interaction):
+            await interaction.response.edit_message(content="You rated it 5/5", view=None)
+            feedback_data[key] = {"noise": noise, "rating": 5}
+            with open('feedback.json', 'w') as file:
+                json.dump(feedback_data, file)
+        button1.callback = button_1_callback
+        button2.callback = button_2_callback
+        button3.callback = button_3_callback
+        button4.callback = button_4_callback
+        button5.callback = button_5_callback
         try:
             with open('user.json', 'r') as file:
                 user_data = json.load(file)
