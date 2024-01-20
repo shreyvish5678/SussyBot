@@ -22,5 +22,7 @@ def handle_response(message) -> str:
         for key, value in sorted_data.items():
             val += 1
             string += f"`{val}. {key}: {value}`\n"
+            if val == 10:
+                break
         return string
     
