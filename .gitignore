@@ -2,3 +2,4 @@
 *.json
 bot.py
 responses.py
+dump.rdb
