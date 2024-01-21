@@ -1,5 +1,4 @@
 .env
 *.json
-bot.py
-responses.py
-dump.rdb
+data
+__pycache__/
