@@ -11,6 +11,7 @@ import json
 import redis
 load_dotenv()
 response_times = {}
+spam = {}
 TOKEN = os.getenv("BOT_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
@@ -20,9 +21,16 @@ async def send_message(message, user_message, is_private):
     try:
         user_id = str(message.author.id)
         user_name = str(message.author)
+        if user_id in spam:
+            if spam[user_id] >= 15:
+                return
         if user_id in response_times:
             elapsed_time = time.time() - response_times[user_id]
             if elapsed_time < 5:
+                if user_id in spam:
+                    spam[user_id] += 1
+                else:
+                    spam[user_id] = 1
                 await message.author.send(f"Please wait {user_name}!") if is_private else await message.channel.send(f"Please wait {user_name}!")
                 return
         response_times[user_id] = time.time()
