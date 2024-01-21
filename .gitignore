@@ -1,2 +1,4 @@
 .env
 *.json
+bot.py
+responses.py
