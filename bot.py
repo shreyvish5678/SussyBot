@@ -41,16 +41,16 @@ async def send_message(message, user_message, is_private):
                     spam[user_id][0] += 1
                     spam[user_id][1] = time.time()
                 else:
-                    spam[user_id] = (0, 0)
+                    spam[user_id] = [0, 0]
                     spam[user_id][0] = 1
                     spam[user_id][1] = time.time()
+                redis_client.set('spam_data', json.dumps(spam))
                 if spam[user_id][0] >= 15:
-                    await message.author.send(f"User {user_name} has been banned from using the bot for a day!") if is_private else await message.channel.send(f"User {user_name} has been banned from using the bot for a day!")
+                    await message.author.send(f"**User {user_name} has been banned from using the bot for a day!**") if is_private else await message.channel.send(f"**User {user_name} has been banned from using the bot for a day!**")
                 else:
                     await message.author.send(f"Please wait {user_name}!") if is_private else await message.channel.send(f"Please wait {user_name}!")
                 return
         response_times[user_id] = time.time()
-        redis_client.set('spam_data', json.dumps(spam))
         response = responses.handle_response(user_message)
         if isinstance(response, dict):
             image_data = np.array(response["image"], dtype=np.uint8)
