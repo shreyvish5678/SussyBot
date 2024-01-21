@@ -5,14 +5,11 @@ from dotenv import load_dotenv
 from PIL import Image
 import numpy as np
 import io
-import numpy
 import time
 import tensorflow as tf
 import json
-import redis
 load_dotenv()
 response_times = {}
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 TOKEN = os.getenv("BOT_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
