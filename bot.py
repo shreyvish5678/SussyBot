@@ -22,8 +22,13 @@ async def send_message(message, user_message, is_private):
         user_id = str(message.author.id)
         user_name = str(message.author)
         if user_id in spam:
-            if spam[user_id][0] >= 15 and time.time() - spam[user_id][1] <= 86400:
-                return
+            if spam[user_id][0] >= 15:
+                if time.time() - spam[user_id][1] <= 86400:
+                    return
+                else:
+                    spam[user_id][0] = 0
+                    spam[user_id][1] = 0
+        
         if user_id in response_times:
             elapsed_time = time.time() - response_times[user_id]
             if elapsed_time < 5:
@@ -31,8 +36,12 @@ async def send_message(message, user_message, is_private):
                     spam[user_id][0] += 1
                     spam[user_id][1] = time.time()
                 else:
-                    spam[user_id] = 1
-                await message.author.send(f"Please wait {user_name}!") if is_private else await message.channel.send(f"Please wait {user_name}!")
+                    spam[user_id][0] = 1
+                    spam[user_id][1] = time.time()
+                if spam[user_id] >= 15:
+                    await message.author.send(f"User {user_name} has been banned from using the bot for a day!") if is_private else await message.channel.send(f"User {user_name} has been banned from using the bot for a day!")
+                else:
+                    await message.author.send(f"Please wait {user_name}!") if is_private else await message.channel.send(f"Please wait {user_name}!")
                 return
         response_times[user_id] = time.time()
         response = responses.handle_response(user_message)
