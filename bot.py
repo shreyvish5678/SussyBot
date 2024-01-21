@@ -53,30 +53,45 @@ async def send_message(message, user_message, is_private):
                 feedback_data = {}
             key = max([int(digit) for digit in list(feedback_data.keys())], default=-1) + 1 if feedback_data else 0
             async def button_1_callback(interaction: discord.Interaction):
-                await interaction.response.edit_message(content="You rated it 1/5", view=None)
-                feedback_data[key] = {"noise": noise, "rating": 1}
-                with open('feedback.json', 'w') as file:
-                    json.dump(feedback_data, file)
+                if interaction.user.name == user_name:
+                    await interaction.response.edit_message(content="You rated it 1/5", view=None)
+                    feedback_data[key] = {"noise": noise, "rating": 1}
+                    with open('feedback.json', 'w') as file:
+                        json.dump(feedback_data, file)
+                else:
+                    pass
             async def button_2_callback(interaction: discord.Interaction):
-                await interaction.response.edit_message(content="You rated it 2/5", view=None)
-                feedback_data[key] = {"noise": noise, "rating": 2}
-                with open('feedback.json', 'w') as file:
-                    json.dump(feedback_data, file)
+                if interaction.user.name == user_name:
+                    await interaction.response.edit_message(content="You rated it 2/5", view=None)
+                    feedback_data[key] = {"noise": noise, "rating": 2}
+                    with open('feedback.json', 'w') as file:
+                        json.dump(feedback_data, file)
+                else:
+                    pass
             async def button_3_callback(interaction: discord.Interaction):
-                await interaction.response.edit_message(content="You rated it 3/5", view=None)
-                feedback_data[key] = {"noise": noise, "rating": 3}
-                with open('feedback.json', 'w') as file:
-                    json.dump(feedback_data, file)
+                if interaction.user.name == user_name:
+                    await interaction.response.edit_message(content="You rated it 3/5", view=None)
+                    feedback_data[key] = {"noise": noise, "rating": 3}
+                    with open('feedback.json', 'w') as file:
+                        json.dump(feedback_data, file)
+                else:
+                    pass
             async def button_4_callback(interaction: discord.Interaction):
-                await interaction.response.edit_message(content="You rated it 4/5", view=None)
-                feedback_data[key] = {"noise": noise, "rating": 4}
-                with open('feedback.json', 'w') as file:
-                    json.dump(feedback_data, file)
+                if interaction.user.name == user_name:
+                    await interaction.response.edit_message(content="You rated it 4/5", view=None)
+                    feedback_data[key] = {"noise": noise, "rating": 4}
+                    with open('feedback.json', 'w') as file:
+                        json.dump(feedback_data, file)
+                else:
+                    pass
             async def button_5_callback(interaction: discord.Interaction):
-                await interaction.response.edit_message(content="You rated it 5/5", view=None)
-                feedback_data[key] = {"noise": noise, "rating": 5}
-                with open('feedback.json', 'w') as file:
-                    json.dump(feedback_data, file)
+                if interaction.user.name == user_name:
+                    await interaction.response.edit_message(content="You rated it 5/5", view=None)
+                    feedback_data[key] = {"noise": noise, "rating": 5}
+                    with open('feedback.json', 'w') as file:
+                        json.dump(feedback_data, file)
+                else:
+                    pass
             button1.callback = button_1_callback
             button2.callback = button_2_callback
             button3.callback = button_3_callback
