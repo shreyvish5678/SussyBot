@@ -7,13 +7,15 @@ import io
 import time
 import tensorflow as tf
 import json
+from dotenv import load_dotenv
 import redis
+load_dotenv()
 response_times = {}
-TOKEN = os.environ["BOT_TOKEN"]
+TOKEN = os.getenv("BOT_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
-redis_client = redis.StrictRedis(host="usw1-major-platypus-33840.upstash.io", port='33840', password=os.environ["PASSWORD"], decode_responses=True)
+redis_client = redis.StrictRedis(host="usw1-major-platypus-33840.upstash.io", port='33840', password=os.getenv("PASSWORD"), decode_responses=True)
 async def send_message(message, user_message, is_private):
     try:
         user_id = str(message.author.id)

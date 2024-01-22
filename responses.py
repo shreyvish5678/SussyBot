@@ -2,8 +2,10 @@ import tensorflow as tf
 import json
 import redis
 import os
+from dotenv import load_dotenv
+load_dotenv()
 interpreter = tf.lite.Interpreter(model_path='human_face_generator.tflite')
-redis_client = redis.StrictRedis(host="usw1-major-platypus-33840.upstash.io", port='33840', password=os.environ["PASSWORD"], decode_responses=True)
+redis_client = redis.StrictRedis(host="usw1-major-platypus-33840.upstash.io", port='33840', password=os.getenv("PASSWORD"), decode_responses=True)
 def handle_response(message) -> str:
     message = message.lower()
     if message == "generate":
