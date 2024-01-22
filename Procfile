@@ -1,1 +1,1 @@
-web: gunicorn main:app
+web: gunicorn bot:run_discord_bot
